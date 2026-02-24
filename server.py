@@ -6,7 +6,10 @@ PORT = 8000
 HOST = 'localhost'
 
 # Example server response HTML
-RESPONSE_CONTENT = "<h1>Hello from Python!</h1>"
+EXAMPLE_CONTENT = "<h1>Hello from Python!</h1>"
+
+# Visitor counting
+VISITORS_COUNT = 0
 
 
 def parse_request(request_data):
@@ -27,6 +30,7 @@ def parse_request(request_data):
 
 
 def generate_response(content, status_code="200 OK"):
+
     header = f"HTTP/1.1 {status_code}\r\n"
     header += "Content-Type: text/html\r\n"
 
@@ -40,6 +44,8 @@ def generate_response(content, status_code="200 OK"):
 
 
 def start_server():
+    global VISITORS_COUNT, HOST, PORT
+
     # 1. Create a socket object (IPv4, TCP)
     # AF_INET = IPv4, SOCK_STREAM = TCP
     server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -68,7 +74,18 @@ def start_server():
         print(f"--- Received Request ---\n{request_data}\n------------------------")
 
         # Send a response to the client based on their request
-        response = generate_response(RESPONSE_CONTENT)
+        # response = generate_response(EXAMPLE_CONTENT)
+
+        if '/' == request_data:
+            VISITORS_COUNT += 1
+            response = generate_response(f"<h1>Visitors</h1><p>This page has been visited {VISITORS_COUNT} times</p>")
+
+        elif '/favicon.ico' == request_data:
+            response = generate_response("<h1>Visitors</h1><p>favicon.ico not found</p>", "404 Not Found")
+
+        else:
+            response = generate_response("<h1>Visitors</h1><p>404</p>", "404 Not Found")
+
         client_connection.sendall(response)
         client_connection.close()
 
