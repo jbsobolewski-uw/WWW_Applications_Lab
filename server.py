@@ -5,6 +5,9 @@ import socket
 PORT = 8000
 HOST = 'localhost'
 
+# Example server response HTML
+RESPONSE_CONTENT = "<h1>Hello from Python!</h1>"
+
 
 def parse_request(request_data):
     if not request_data:
@@ -21,6 +24,19 @@ def parse_request(request_data):
     path = request_data[1]
 
     return path
+
+
+def generate_response(content, status_code="200 OK"):
+    header = f"HTTP/1.1 {status_code}\r\n"
+    header += "Content-Type: text/html\r\n"
+
+    # Calculate Content-Length (It is crucial!)
+    header += f"Content-Length: {len(content)}\r\n"
+
+    header += "\r\n"  # The blank line
+    response_str = header + content
+
+    return response_str.encode('utf-8')  # Send bytes, not strings
 
 
 def start_server():
@@ -50,6 +66,11 @@ def start_server():
         request_data = client_connection.recv(1024).decode('utf-8')
         request_data = parse_request(request_data)
         print(f"--- Received Request ---\n{request_data}\n------------------------")
+
+        # Send a response to the client based on their request
+        response = generate_response(RESPONSE_CONTENT)
+        client_connection.sendall(response)
+        client_connection.close()
 
         # Close connection immediately (for now)
         client_connection.close()
