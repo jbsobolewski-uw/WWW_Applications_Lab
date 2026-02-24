@@ -1,5 +1,6 @@
 # server.py
 import socket
+import threading
 
 # Server host configuration
 PORT = 8000
@@ -10,6 +11,9 @@ EXAMPLE_CONTENT = "<h1>Hello from Python!</h1>"
 
 # Visitor counting
 VISITORS_COUNT = 0
+
+# Lock for thread-safe visitor counting
+VISITORS_LOCK = threading.Lock()
 
 
 def parse_request(request_data):
@@ -43,8 +47,49 @@ def generate_response(content, status_code="200 OK"):
     return response_str.encode('utf-8')  # Send bytes, not strings
 
 
+def handle_client(client_connection, client_address):
+    global VISITORS_COUNT
+
+    print(f"Connection received!")
+
+    # Receive raw bytes (buffer size 1024)
+    request_data = client_connection.recv(1024).decode('utf-8')
+    request_data = parse_request(request_data)
+    print(f"--- Received Request ---\n{request_data}\n------------------------")
+
+    # Send a response to the client based on their request
+    # response = generate_response(EXAMPLE_CONTENT)
+
+    if '/' == request_data:
+        # Thread-safe increment - Lock is crucial here!
+        with VISITORS_LOCK:
+            VISITORS_COUNT += 1
+            current_count = VISITORS_COUNT
+
+        response = generate_response(
+            f"<h1>Visitors</h1><p>This page has been visited {current_count} times</p>"
+        )
+
+    elif '/favicon.ico' == request_data:
+        response = generate_response(
+            "<h1>Visitors</h1><p>favicon.ico not found</p>",
+            "404 Not Found"
+        )
+
+    else:
+        response = generate_response(
+            "<h1>Visitors</h1><p>404</p>",
+            "404 Not Found"
+        )
+
+    client_connection.sendall(response)
+
+    # Close connection immediately (for now)
+    client_connection.close()
+
+
 def start_server():
-    global VISITORS_COUNT, HOST, PORT
+    global HOST, PORT
 
     # 1. Create a socket object (IPv4, TCP)
     # AF_INET = IPv4, SOCK_STREAM = TCP
@@ -66,31 +111,15 @@ def start_server():
         # Accept a new connection
         client_connection, client_address = server_socket.accept()
 
-        print(f"Connection received!")
+        # Create a new thread for each client
+        client_thread = threading.Thread(
+            target=handle_client,
+            args=(client_connection, client_address)
+        )
 
-        # Receive raw bytes (buffer size 1024)
-        request_data = client_connection.recv(1024).decode('utf-8')
-        request_data = parse_request(request_data)
-        print(f"--- Received Request ---\n{request_data}\n------------------------")
-
-        # Send a response to the client based on their request
-        # response = generate_response(EXAMPLE_CONTENT)
-
-        if '/' == request_data:
-            VISITORS_COUNT += 1
-            response = generate_response(f"<h1>Visitors</h1><p>This page has been visited {VISITORS_COUNT} times</p>")
-
-        elif '/favicon.ico' == request_data:
-            response = generate_response("<h1>Visitors</h1><p>favicon.ico not found</p>", "404 Not Found")
-
-        else:
-            response = generate_response("<h1>Visitors</h1><p>404</p>", "404 Not Found")
-
-        client_connection.sendall(response)
-        client_connection.close()
-
-        # Close connection immediately (for now)
-        client_connection.close()
+        # Daemon thread (optional: closes with main program)
+        client_thread.daemon = True
+        client_thread.start()
 
 
 if __name__ == '__main__':
