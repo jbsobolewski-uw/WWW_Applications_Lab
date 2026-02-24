@@ -6,14 +6,16 @@ import threading
 PORT = 8000
 HOST = 'localhost'
 
-# Example server response HTML
-EXAMPLE_CONTENT = "<h1>Hello from Python!</h1>"
 
-# Visitor counting
-VISITORS_COUNT = 0
+def read_file(path):
+    try:
+        # Attempt to retrieve the requested page
+        with open("." + path, "r") as f:
+            return f.read(), "200 OK"
 
-# Lock for thread-safe visitor counting
-VISITORS_LOCK = threading.Lock()
+    except FileNotFoundError:
+        return "<h1>404 Not Found</h1>", "404 Not Found"
+
 
 
 def parse_request(request_data):
@@ -34,55 +36,27 @@ def parse_request(request_data):
 
 
 def generate_response(content, status_code="200 OK"):
-
     header = f"HTTP/1.1 {status_code}\r\n"
-    header += "Content-Type: text/html\r\n"
+    header += "Content-Type: text/html; charset=utf-8\r\n"
 
     # Calculate Content-Length (It is crucial!)
-    header += f"Content-Length: {len(content)}\r\n"
+    body = content.encode("utf-8")
+    header += f"Content-Length: {len(body)}\r\n"
 
     header += "\r\n"  # The blank line
-    response_str = header + content
 
-    return response_str.encode('utf-8')  # Send bytes, not strings
+    return header.encode("utf-8") + body  # Send bytes, not strings
 
 
 def handle_client(client_connection, client_address):
-    global VISITORS_COUNT
-
-    print(f"Connection received!")
-
     # Receive raw bytes (buffer size 1024)
     request_data = client_connection.recv(1024).decode('utf-8')
-    request_data = parse_request(request_data)
-    print(f"--- Received Request ---\n{request_data}\n------------------------")
+    path = parse_request(request_data)
 
     # Send a response to the client based on their request
-    # response = generate_response(EXAMPLE_CONTENT)
-
-    if '/' == request_data:
-        # Thread-safe increment - Lock is crucial here!
-        with VISITORS_LOCK:
-            VISITORS_COUNT += 1
-            current_count = VISITORS_COUNT
-
-        response = generate_response(
-            f"<h1>Visitors</h1><p>This page has been visited {current_count} times</p>"
-        )
-
-    elif '/favicon.ico' == request_data:
-        response = generate_response(
-            "<h1>Visitors</h1><p>favicon.ico not found</p>",
-            "404 Not Found"
-        )
-
-    else:
-        response = generate_response(
-            "<h1>Visitors</h1><p>404</p>",
-            "404 Not Found"
-        )
-
-    client_connection.sendall(response)
+    content, status = read_file(path if path != "/" else "/index.html")
+    response_data = generate_response(content, status)
+    client_connection.sendall(response_data)
 
     # Close connection immediately (for now)
     client_connection.close()
