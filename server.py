@@ -1,6 +1,27 @@
 # server.py
 import socket
 
+# Server host configuration
+PORT = 8000
+HOST = 'localhost'
+
+
+def parse_request(request_data):
+    if not request_data:
+        return ""
+
+    # Split the string into lines
+    request_data = request_data.split('\n')
+
+    # Take the first line ("GET / HTTP/1.1")
+    request_data = request_data[0]
+
+    # Split by spaces and return the middle part ("/")
+    request_data = request_data.split(' ')
+    path = request_data[1]
+
+    return path
+
 
 def start_server():
     # 1. Create a socket object (IPv4, TCP)
@@ -12,12 +33,12 @@ def start_server():
 
     # Bind the socket to 'localhost' and port 8000
     # Hint: bind() takes a tuple: ('host', port)
-    server_socket.bind(('localhost', 8080))
+    server_socket.bind((HOST, PORT))
 
     # Start listening for connections (backlog of 5)
     server_socket.listen(5)
 
-    print("Server running on http://localhost:8000 ...")
+    print(f"Server running on http://{HOST}:{PORT} ...")
 
     while True:
         # Accept a new connection
@@ -27,6 +48,7 @@ def start_server():
 
         # Receive raw bytes (buffer size 1024)
         request_data = client_connection.recv(1024).decode('utf-8')
+        request_data = parse_request(request_data)
         print(f"--- Received Request ---\n{request_data}\n------------------------")
 
         # Close connection immediately (for now)
