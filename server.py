@@ -10,16 +10,18 @@ def start_server():
     # Allow the port to be reused immediately (prevents "Address already in use" errors)
     server_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
 
-    # TODO: Bind the socket to 'localhost' and port 8000
+    # Bind the socket to 'localhost' and port 8000
     # Hint: bind() takes a tuple: ('host', port)
+    server_socket.bind(('localhost', 8080))
 
-    # TODO: Start listening for connections (backlog of 5)
+    # Start listening for connections (backlog of 5)
+    server_socket.listen(5)
 
     print("Server running on http://localhost:8000 ...")
 
     while True:
-        # TODO: Accept a new connection
-        # client_connection, client_address = ...
+        # Accept a new connection
+        client_connection, client_address = server_socket.accept()
 
         print(f"Connection received!")
 
