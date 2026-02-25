@@ -1,4 +1,6 @@
 # server.py
+import os.path
+import os.path
 import socket
 import threading
 
@@ -7,10 +9,15 @@ PORT = 8000
 HOST = 'localhost'
 
 
-def read_file(path):
+def read_file(file_path):
+    # Validate file path
+    good_path = os.path.normpath("." + file_path)
+    if not good_path.startswith("./public"):
+        return "<h1>403 Resource forbidden</h1>", "403 Forbidden"
+
     try:
         # Attempt to retrieve the requested page
-        with open("." + path, "r") as f:
+        with open(good_path, "r") as f:
             return f.read(), "200 OK"
 
     except FileNotFoundError:
