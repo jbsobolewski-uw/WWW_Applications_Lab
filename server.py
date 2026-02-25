@@ -1,12 +1,12 @@
 # server.py
 import os
 import socket
-import threading
+from concurrent.futures import ThreadPoolExecutor
 
 # Server host configuration
 PORT = 8000
 HOST = 'localhost'
-
+THREAD_POOL = ThreadPoolExecutor(max_workers=os.process_cpu_count())
 
 def read_file(file_path):
     # Validate file path
@@ -115,7 +115,7 @@ def handle_client(client_connection, client_address):
 
 
 def start_server():
-    global HOST, PORT
+    global HOST, PORT, THREAD_POOL
 
     # Create a socket object (IPv4, TCP)
     # AF_INET = IPv4, SOCK_STREAM = TCP
@@ -137,15 +137,13 @@ def start_server():
         # Accept a new connection
         client_connection, client_address = server_socket.accept()
 
-        # Create a new thread for each client
-        client_thread = threading.Thread(
-            target=handle_client,
-            args=(client_connection, client_address)
-        )
-
-        # Daemon thread (optional: closes with main program)
-        client_thread.daemon = True
-        client_thread.start()
+        # Concurrently process client requests
+        future = THREAD_POOL.submit(handle_client, client_connection, client_address)
+        try:
+            future.result(timeout=10)  # Timeout in seconds
+        except TimeoutError:
+            print(f"Client {client_address} timeout - closing")
+            client_connection.close()
 
 
 if __name__ == '__main__':
