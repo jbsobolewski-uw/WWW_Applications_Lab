@@ -1,6 +1,5 @@
 # server.py
 import os.path
-import os.path
 import socket
 import threading
 
@@ -47,6 +46,17 @@ def parse_request(request_data):
     path = request_data[1]
 
     return path
+
+
+def parse_contact_form(request_data):
+    # The body is separated from headers by a blank line
+    parts = request_data.split("\r\n\r\n", 1)
+    if len(parts) < 2:
+        return {}
+    body = parts[1]
+    # TODO: Split body by '&', then each pair by '=',
+    # return a dict like {"name": "Alice", "email": "..."}
+    return {}
 
 
 def generate_response(content, status_code="200 OK"):
