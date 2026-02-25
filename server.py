@@ -1,5 +1,5 @@
 # server.py
-import os.path
+import os
 import socket
 import threading
 
@@ -15,12 +15,12 @@ def read_file(file_path):
         return "<h1>403 Resource forbidden</h1>", "403 Forbidden"
 
     try:
-        # Otwórz plik z jawnie określonym kodowaniem UTF-8
+        # Open UTF-8 file
         with open(good_path, "r", encoding="utf-8") as f:
             return f.read(), "200 OK"
 
     except UnicodeDecodeError:
-        # Fallback dla plików z innymi kodowaniami
+        # Fallback for a different encoding
         try:
             with open(good_path, "r", encoding="utf-8-sig") as f:
                 return f.read(), "200 OK"
@@ -54,9 +54,32 @@ def parse_contact_form(request_data):
     if len(parts) < 2:
         return {}
     body = parts[1]
-    # TODO: Split body by '&', then each pair by '=',
+
+    # Split body by '&', then each pair by '=',
     # return a dict like {"name": "Alice", "email": "..."}
-    return {}
+
+    form_data = {}
+    pairs = body.split('&')
+    for pair in pairs:
+        if '=' in pair:
+            key, value = pair.split('=', 1)
+            form_data[key] = value
+
+    return form_data
+
+
+def process_contact_form(request_data):
+    form_data = parse_contact_form(request_data)
+    print("Form data received:", form_data)
+
+    # Simple response for form submission
+    content = f"""
+            <h1>Thank you, {form_data["name"]}!</h1>
+            <p>Your message has been received.</p>
+            <ul>
+            """
+    content += "</ul><a href='/public/index.html'>Back</a>"
+    return content, "200 OK"
 
 
 def generate_response(content, status_code="200 OK"):
@@ -77,8 +100,13 @@ def handle_client(client_connection, client_address):
     request_data = client_connection.recv(1024).decode('utf-8')
     path = parse_request(request_data)
 
-    # Send a response to the client based on their request
-    content, status = read_file(path if path != "/" else "/public/index.html")
+    # Check if it's a POST request to /submit
+    if request_data.startswith('POST /submit') and 'Content-Length' in request_data:
+        content, status = process_contact_form(request_data)
+    else:
+        # Send a response to the client based on their request
+        content, status = read_file(path if path != "/" else "/public/index.html")
+
     response_data = generate_response(content, status)
     client_connection.sendall(response_data)
 
@@ -89,7 +117,7 @@ def handle_client(client_connection, client_address):
 def start_server():
     global HOST, PORT
 
-    # 1. Create a socket object (IPv4, TCP)
+    # Create a socket object (IPv4, TCP)
     # AF_INET = IPv4, SOCK_STREAM = TCP
     server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
