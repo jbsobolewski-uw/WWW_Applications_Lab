@@ -12,23 +12,28 @@ def read_file(file_path):
     # Validate file path
     good_path = os.path.normpath("." + file_path)
     if not good_path.startswith("public"):
-        return "<h1>403 Resource forbidden</h1>", "403 Forbidden"
+        return "<h1>403 Resource forbidden</h1>", "403 Forbidden", "text/html"
+
+    if good_path.endswith(".css"):
+        content_type = "text/css"
+    else:
+        content_type = "text/html"
 
     try:
         # Open UTF-8 file
         with open(good_path, "r", encoding="utf-8") as f:
-            return f.read(), "200 OK"
+            return f.read(), "200 OK", content_type
 
     except UnicodeDecodeError:
         # Fallback for a different encoding
         try:
             with open(good_path, "r", encoding="utf-8-sig") as f:
-                return f.read(), "200 OK"
+                return f.read(), "200 OK", content_type
         except UnicodeDecodeError:
-            return "<h1>500 Encoding Error</h1>", "500 Internal Server Error"
+            return "<h1>500 Encoding Error</h1>", "500 Internal Server Error", content_type
 
     except FileNotFoundError:
-        return "<h1>404 Not Found</h1>", "404 Not Found"
+        return "<h1>404 Not Found</h1>", "404 Not Found", content_type
 
 
 def parse_request(request_data):
@@ -74,17 +79,18 @@ def process_contact_form(request_data):
 
     # Simple response for form submission
     content = f"""
+            <title>Message received</title>
             <h1>Thank you, {form_data["name"]}!</h1>
             <p>Your message has been received.</p>
             <ul>
             """
     content += "</ul><a href='/public/index.html'>Back</a>"
-    return content, "200 OK"
+    return content, "200 OK", "text/html"
 
 
-def generate_response(content, status_code="200 OK"):
+def generate_response(content, status_code="200 OK", content_type="text/html"):
     header = f"HTTP/1.1 {status_code}\r\n"
-    header += "Content-Type: text/html; charset=utf-8\r\n"
+    header += f"Content-Type: {content_type}; charset=utf-8\r\n"
 
     # Calculate Content-Length (It is crucial!)
     body = content.encode("utf-8")
@@ -102,12 +108,12 @@ def handle_client(client_connection, client_address):
 
     # Check if it's a POST request to /submit
     if request_data.startswith('POST /submit') and 'Content-Length' in request_data:
-        content, status = process_contact_form(request_data)
+        content, status, content_type = process_contact_form(request_data)
     else:
         # Send a response to the client based on their request
-        content, status = read_file(path if path != "/" else "/public/index.html")
+        content, status, content_type = read_file(path if path != "/" else "/public/index.html")
 
-    response_data = generate_response(content, status)
+    response_data = generate_response(content, status_code=status, content_type=content_type)
     client_connection.sendall(response_data)
 
     # Close connection immediately (for now)
