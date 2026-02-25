@@ -12,17 +12,24 @@ HOST = 'localhost'
 def read_file(file_path):
     # Validate file path
     good_path = os.path.normpath("." + file_path)
-    if not good_path.startswith("./public"):
+    if not good_path.startswith("public"):
         return "<h1>403 Resource forbidden</h1>", "403 Forbidden"
 
     try:
-        # Attempt to retrieve the requested page
-        with open(good_path, "r") as f:
+        # Otwórz plik z jawnie określonym kodowaniem UTF-8
+        with open(good_path, "r", encoding="utf-8") as f:
             return f.read(), "200 OK"
+
+    except UnicodeDecodeError:
+        # Fallback dla plików z innymi kodowaniami
+        try:
+            with open(good_path, "r", encoding="utf-8-sig") as f:
+                return f.read(), "200 OK"
+        except UnicodeDecodeError:
+            return "<h1>500 Encoding Error</h1>", "500 Internal Server Error"
 
     except FileNotFoundError:
         return "<h1>404 Not Found</h1>", "404 Not Found"
-
 
 
 def parse_request(request_data):
@@ -61,7 +68,7 @@ def handle_client(client_connection, client_address):
     path = parse_request(request_data)
 
     # Send a response to the client based on their request
-    content, status = read_file(path if path != "/" else "/index.html")
+    content, status = read_file(path if path != "/" else "/public/index.html")
     response_data = generate_response(content, status)
     client_connection.sendall(response_data)
 

@@ -2,26 +2,47 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Contact</title>
+    <title>Projects</title>
 </head>
 <body>
-<h1>Contact Me</h1>
+<h1>My Projects</h1>
 
-<form action="/submit" method="POST">
+<table>
+    <thead>
+    <tr>
+        <!-- Add <th> headers: Name, Language, Status, Link -->
+        <th>Project name</th>
+        <th>Language</th>
+        <th>Completion status</th>
+        <th>Project page</th>
+    </tr>
+    </thead>
+    <tbody>
+    <!-- Add at least 3 <tr> rows.
+         Note: Each row needs 4 <td> cells.
+         The Link cell should contain an <a> tag.
+         Use target="_blank" to open in a new tab. -->
+    <tr>
+        <td>Moore Machines library</td> <!-- name -->
+        <td>C17</td> <!-- language -->
+        <td>Completed</td> <!-- status -->
+        <td><a href="/public/index.html" target="_blank"> link</a></td> <!-- link -->
+    </tr>
+    <tr>
+        <td>WikiScrapper package</td> <!-- name -->
+        <td>Python3</td> <!-- language -->
+        <td>Completed</td> <!-- status -->
+        <td><a href="/public/index.html" target="_blank"> link</a></td> <!-- link -->
+    </tr>
+    <tr>
+        <td>Threaded Datalog evaluator</td> <!-- name -->
+        <td>Java</td> <!-- language -->
+        <td>Completed</td> <!-- status -->
+        <td><a href="/public/index.html" target="_blank"> link</a></td> <!-- link -->
+    </tr>
+    </tbody>
+</table>
 
-    <!-- TODO: Add a label + text input for "Name"
-         Hint: <label for="name">Name</label>
-               <input type="text" id="name" name="name" required> -->
-
-    <!-- TODO: Add a label + email input for "Email" -->
-
-    <!-- TODO: Add a label + <textarea> for "Message" (rows=5, cols=40) -->
-
-    <!-- TODO: Add a label + <select> dropdown for "Subject"
-         with options: General, Bug Report, Feature Request -->
-
-    <!-- TODO: Add a submit button -->
-
-</form>
+<p><a href="index.html">← Back to Home</a></p>
 </body>
 </html>
