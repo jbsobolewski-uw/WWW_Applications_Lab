@@ -1,8 +1,76 @@
-/* TODO: Set a font-family on body (try: 'Segoe UI', system-ui, sans-serif)
-   and a default font-size of 16px */
+/* GLOBAL STYLESHEET */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
 
-/* TODO: Style h1, h2, h3 — pick sizes, a color, and a bottom margin */
+body {
+    font-family: 'Courier New', Consolas, monospace;
+    font-size: 16px;
+    color: chartreuse;
+    background-color: black;
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 20px;
+    line-height: 1.6;
+}
 
-/* TODO: Give <a> tags a color and remove the underline on hover */
+/* HEADERS */
+h1 {
+    font-size: 46pt;
+    color: snow; /* white-ish for better contrast */
+    margin-bottom: 12pt;
+    /*text-shadow: 0 0 5px currentColor;*/
+}
 
-/* TODO: Set a max-width of 900px on body and center it with margin: 0 auto */
+h2 {
+    font-size: 32pt;
+    color: snow;
+    margin-bottom: 12pt;
+    border-bottom: 1px solid #333;
+    padding-bottom: 5pt;
+}
+
+h3 {
+    font-size: 24pt;
+    color: snow;
+    margin-bottom: 12pt;
+}
+
+/* LINKS */
+a {
+    color: #548AF7; /* bright green */
+    text-decoration: none;
+    border-bottom: 1px dotted currentColor;
+    transition: all 0.1s;
+}
+
+a:hover {
+    color: snow;
+    text-shadow: 0 0 5px chartreuse;
+    border-bottom-style: solid;
+}
+
+/* ADDITIONAL ELEMENTS */
+pre, code {
+    background: #111;
+    padding: 10px;
+    border-left: 4px solid chartreuse;
+    margin: 10px 0;
+    font-family: inherit;
+}
+
+.container {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 0 20px;
+}
+
+/* RESPONSIVITY */
+@media (max-width: 768px) {
+    body {
+        padding: 10px;
+        font-size: 14px;
+    }
+}
