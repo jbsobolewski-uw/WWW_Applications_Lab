@@ -89,13 +89,12 @@ def process_contact_form(request_data):
 
 
 def generate_response(content, status_code="200 OK", content_type="text/html"):
-    header = f"HTTP/1.1 {status_code}\r\n"
-    header += f"Content-Type: {content_type}; charset=utf-8\r\n"
-
-    # Calculate Content-Length (It is crucial!)
     body = content.encode("utf-8")
-    header += f"Content-Length: {len(body)}\r\n"
 
+    header = f"HTTP/1.1 {status_code}\r\n"
+    header += f"Content-Type: {content_type}, charset=utf-8\r\n"
+    header += f"Cache-Control: no-store, must-revalidate\r\n"
+    header += f"Content-Length: {len(body)}\r\n\r\n"
     header += "\r\n"  # The blank line
 
     return header.encode("utf-8") + body  # Send bytes, not strings
