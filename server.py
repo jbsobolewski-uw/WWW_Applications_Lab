@@ -8,16 +8,23 @@ PORT = 8000
 HOST = 'localhost'
 THREAD_POOL = ThreadPoolExecutor(max_workers=os.process_cpu_count())
 
+MIME_TYPES = {
+    ".html": "text/html",
+    ".css": "text/css",
+    ".js": "application/javascript",
+    ".png": "image/png",
+    ".jpg": "image/jpeg",
+    ".ico": "image/x-icon",
+}
+
+
 def read_file(file_path):
     # Validate file path
     good_path = os.path.normpath("." + file_path)
     if not good_path.startswith("public"):
         return "<h1>403 Resource forbidden</h1>", "403 Forbidden", "text/html"
 
-    if good_path.endswith(".css"):
-        content_type = "text/css"
-    else:
-        content_type = "text/html"
+    content_type = MIME_TYPES.get("." + good_path.split(".")[-1], "text/html")
 
     try:
         # Open UTF-8 file
