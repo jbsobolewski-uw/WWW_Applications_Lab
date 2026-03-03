@@ -86,12 +86,20 @@ def process_contact_form(request_data):
 
     # Simple response for form submission
     content = f"""
+    <!DOCTYPE html>
+        <html lang="en">
+        <head>
             <title>Message received</title>
+            <link href="/public/style.css" rel="stylesheet">
+        </head>
+        <body>
             <h1>Thank you, {form_data["name"]}!</h1>
             <p>Your message has been received.</p>
-            <ul>
-            """
-    content += "</ul><a href='/public/index.html'>Back</a>"
+            <ul></ul> <a href='/public/index.html'>Back</a>                
+        </body>
+    </html>
+            
+    """
     return content, "200 OK", "text/html"
 
 
@@ -109,7 +117,7 @@ def generate_response(content, status_code="200 OK", content_type="text/html"):
 
 def handle_client(client_connection, client_address):
     # Receive raw bytes (buffer size 1024)
-    request_data = client_connection.recv(1024).decode('utf-8')
+    request_data = client_connection.recv(4096).decode('utf-8')
     path = parse_request(request_data)
 
     # Check if it's a POST request to /submit

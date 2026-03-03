@@ -1,76 +1,111 @@
-/* GLOBAL STYLESHEET */
-* {
+/* ── Reset ────────────────────────────────────────── */
+*, *::before, *::after {
+    box-sizing: border-box;
     margin: 0;
     padding: 0;
-    box-sizing: border-box;
 }
 
+/* ── Design tokens ─────────────────────────────────── */
+:root {
+    --primary-color: #2c7be5;
+    --text-color: #333;
+    --bg-color: #f5f7fa;
+    --font-main: 'Segoe UI', system-ui, sans-serif;
+    --spacing-md: 1rem;
+    --spacing-lg: 2rem;
+}
+
+/* Set font-family: var(--font-main) and color: var(--text-color) on body.
+   Add a background: var(--bg-color) and font-size: 16px */
+/* Set a max-width of 900px on body and center it with margin: 0 auto */
 body {
-    font-family: 'Courier New', Consolas, monospace;
+    font-family: var(--font-main);
+    color: var(--text-color);
+    background: var(--bg-color);
     font-size: 16px;
-    color: chartreuse;
-    background-color: black;
     max-width: 900px;
     margin: 0 auto;
-    padding: 20px;
-    line-height: 1.6;
 }
 
-/* HEADERS */
+/* Style h1, h2, h3 — use var(--primary-color) for color,
+   pick sizes, and add a bottom margin using var(--spacing-md) */
+h1, h2, h3 {
+    color: var(--primary-color);
+    margin-bottom: var(--spacing-md);
+}
+
 h1 {
-    font-size: 46pt;
-    color: snow; /* white-ish for better contrast */
-    margin-bottom: 12pt;
-    /*text-shadow: 0 0 5px currentColor;*/
+    font-size: 2.5rem;
 }
 
 h2 {
-    font-size: 32pt;
-    color: snow;
-    margin-bottom: 12pt;
-    border-bottom: 1px solid #333;
-    padding-bottom: 5pt;
+    font-size: 2rem;
 }
 
 h3 {
-    font-size: 24pt;
-    color: snow;
-    margin-bottom: 12pt;
+    font-size: 1.5rem;
 }
 
-/* LINKS */
+/* Give <a> tags color: var(--primary-color) and remove the underline on hover */
 a {
-    color: #548AF7; /* bright green */
-    text-decoration: none;
-    border-bottom: 1px dotted currentColor;
-    transition: all 0.1s;
+    color: var(--primary-color);
 }
 
 a:hover {
-    color: snow;
-    text-shadow: 0 0 5px chartreuse;
-    border-bottom-style: solid;
+    text-decoration: none;
 }
 
-/* ADDITIONAL ELEMENTS */
-pre, code {
-    background: #111;
-    padding: 10px;
-    border-left: 4px solid chartreuse;
-    margin: 10px 0;
-    font-family: inherit;
-}
+/* Give <header> a background color, padding: 1rem 2rem,
+   and a bottom border */
+header {
+    background: var(--primary-color);
+    color: var(--primary-color);
+    padding: 1rem 2rem;
+    border-bottom: 1px solid var(--bg-color);
 
-.container {
-    max-width: 800px;
-    margin: 0 auto;
-    padding: 0 20px;
-}
-
-/* RESPONSIVITY */
-@media (max-width: 768px) {
-    body {
-        padding: 10px;
-        font-size: 14px;
+    a {
+        color: var(--bg-color);
     }
+}
+
+/* Give <footer> a top border, padding, and center-aligned text */
+footer {
+    border-top: 1px solid var(--bg-color);
+    padding: 1rem 2rem;
+    text-align: center;
+}
+
+/* Give <article> a right margin of 2rem */
+article {
+    margin-right: 2rem;
+}
+
+/* Give <aside> a left border, padding-left, and a light background */
+aside {
+    border-left: 3px solid var(--primary-color);
+    margin-top: var(--spacing-md);
+    padding-left: 1.5rem;
+    background: var(--bg-color);
+}
+
+/* Style the projects <table>:
+   - border-collapse: collapse on the table
+   - padding: 0.5rem 1rem on th and td
+   - a bottom border on each tr
+   - a different background on thead */
+
+table {
+    border-collapse: collapse;
+}
+
+th, td {
+    padding: 0.5rem 1rem;
+}
+
+td {
+    border-bottom: 3px solid var(--bg-color);
+}
+
+thead th {
+    background-color: var(--primary-color);
 }
